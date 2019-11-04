@@ -30,9 +30,10 @@ int search(int a[],int x)
             h=(h+1)%hts;
             while(a[h]!=0 && Hi!=h)
               {
-               h=(h+1)%hts;
+               
                if(a[h]==x) {cout<<x<<" Found at index: "<<h<<endl; return h;}
-              }
+               h=(h+1)%hts;  
+            }
 
 
 
