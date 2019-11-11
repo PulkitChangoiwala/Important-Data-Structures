@@ -1,111 +1,130 @@
-//Question link = https://www.hackerearth.com/practice/data-structures/trees/binary-and-nary-trees/tutorial/
-/*Given a binary tree which has T nodes, you need to find the diameter of that binary tree. The diameter of a tree is the number of nodes on the longest path between two leaves in the tree.
-Input:
-First line contains two integers, T and X, number of nodes in the tree and value of the root.
-Next  lines contain details of nodes.
-Each detail of node contains two lines. First lines contains a string and second line contains an integer, which denotes the path of the node and the value of the node respectively.
-String consists of only L or R. L denotes left child and R denotes right child. ( Look at the sample explanation for more details )
-Output:
-Print the diameter of the binary tree.*/
+// Replace A Node With Its predecessor and successor's sum
+#include <bits/stdc++.h> 
+
+using namespace std; 
+
+struct Node { 
+	int data; 
+	struct Node* left, *right; 
+}; 
+struct Node* getNode(int data) 
+{ 
+
+	struct Node* new_node = 
+	(struct Node*)malloc(sizeof(struct Node)); 
 
 
-#include <bits/stdc++.h>
-using namespace std;
-#define M 1000000007
-#define ll long long
-#define REP(i,a,b) for(ll i=a;i<b;i++)
-#define ff first
-#define ss second
-#define pb push_back
-#define mp make_pair
-#define vi vector<int>
-#define vll vector<long long>
-struct node{
-    int val;
-    struct node* left;
-    struct node* right;
-};
-struct node * newnode(int element)
-    {
-        struct node * temp=(node * )malloc(sizeof(node));
-        temp->val=element;
-        temp->left=temp->right=NULL;
-        return temp;
-    }
-void create(string s, int val, struct node* src){
-    struct node *nd = newnode(val);
-    int i=0;
-    struct node *top = src;
-    while(i< s.size()-1){
-        if(s[i] == 'L'){
-            top = top->left;
-        }
-        else if(s[i] == 'R'){
-            top=top->right;
-        }
-        i++;
-    }
-    if(s[i] == 'L'){
-        top->left = nd;
-        }
-    else if(s[i] == 'R'){
-        top->right = nd;
-        }
-}
+	new_node->data = data; 
+	new_node->left = new_node->right = NULL; 
 
-int height(struct node *src){
-    if(src == NULL){
-        return 0;
-    }else{
-        int ldepth = height(src->left);
-        int rdepth = height(src->right);
+	return new_node; 
+} 
 
-        if(ldepth > rdepth){
-            return (ldepth+1);
-        }else{
-            return (rdepth+1);
-        }
-    }
-}
+ 
+void storeInorderTraversal(struct Node* root, 
+								vector<int>& arr) 
+{ 
+	// if root is NULL 
+	if (!root) 
+		return; 
 
-int diameter(struct node *src){
-    if(src == NULL){
-        return 0;
-    }
-    int rheight = height(src->right);
-    int lheight = height(src->left);
+	// first recur on left child 
+	storeInorderTraversal(root->left, arr); 
 
-    int rdia = diameter(src->left);
-    int ldia = diameter(src->right);
+	// then store the root's data in 'arr' 
+	arr.push_back(root->data); 
 
-    return max(1+lheight+rheight, max(rdia, ldia));
-}
+	// now recur on right child 
+	storeInorderTraversal(root->right, arr); 
+} 
 
-int main()
-{
-    ios::sync_with_stdio(0);
-    cin.tie(0);
-    cout.tie(0);
-    /*
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    */
-    int t, x;
-    cin>>t>>x;
-    struct node *cc, *top;
-    top = newnode(x);
-    vector<pair<string, int > > vv(0);
-    REP(i, 0, t-1){
-    string st; 
-    int a;
-    cin>>st>>a;
-    vv.pb(make_pair(st, a));
-    }
-    sort(vv.begin(), vv.end());
-    REP(i, 0, t-1){
-        cc = top;
-        create(vv[i].first, vv[i].second, cc);
-    }
-    //cc = top;
-    cout<<diameter(top);
-}
+// function to replace each node with the sum of its 
+// inorder predecessor and successor 
+void replaceNodeWithSum(struct Node* root, 
+						vector<int> arr, int* i) 
+{ 
+	// if root is NULL 
+	if (!root) 
+		return; 
+
+	// first recur on left child 
+	replaceNodeWithSum(root->left, arr, i); 
+
+	// replace node's data with the sum of its 
+	// inorder predecessor and successor 
+	root->data = arr[*i - 1] + arr[*i + 1]; 
+
+	// move 'i' to point to the next 'arr' element 
+	++*i; 
+
+	// now recur on right child 
+	replaceNodeWithSum(root->right, arr, i); 
+} 
+
+// Utility function to replace each node in binary 
+// tree with the sum of its inorder predecessor 
+// and successor 
+void replaceNodeWithSumUtil(struct Node* root) 
+{ 
+	// if tree is empty 
+	if (!root) 
+		return; 
+
+	vector<int> arr; 
+
+	// store the value of inorder predecessor 
+	// for the leftmost leaf 
+	arr.push_back(0); 
+
+	// store the inoder traversal of the tree in 'arr' 
+	storeInorderTraversal(root, arr); 
+
+	// store the value of inorder successor 
+	// for the rightmost leaf 
+	arr.push_back(0); 
+
+	// replace each node with the required sum 
+	int i = 1; 
+	replaceNodeWithSum(root, arr, &i); 
+} 
+
+// function to print the preorder traversal 
+// of a binary tree 
+void preorderTraversal(struct Node* root) 
+{ 
+	// if root is NULL 
+	if (!root) 
+		return; 
+
+	cout << root->data << " "; 
+
+	// then recur on left subtree 
+	preorderTraversal(root->left); 
+
+	// now recur on right subtree 
+	preorderTraversal(root->right); 
+} 
+
+
+int main() 
+{ 
+	// binary tree formation 
+	struct Node* root = getNode(1); /*		 1	 */
+	root->left = getNode(2);	 /*	 / \	 */
+	root->right = getNode(3);	 /*	 2	 3	 */
+	root->left->left = getNode(4); /* / \ / \ */
+	root->left->right = getNode(5); /* 4 5 6 7 */
+	root->right->left = getNode(6); 
+	root->right->right = getNode(7); 
+
+	cout << "Preorder Traversal before tree modification:n"; 
+	preorderTraversal(root); 
+
+	replaceNodeWithSumUtil(root); 
+
+	cout << "\nPreorder Traversal after tree modification:n"; 
+	preorderTraversal(root); 
+
+	return 0; 
+} 
+
